@@ -2,30 +2,78 @@
 
 import Image from "next/image";
 import AssetSearchComponent from "./components/AssetSearch";
+<<<<<<< Updated upstream
 import { motion, easeOut, TargetAndTransition } from "framer-motion";
 
+=======
+import { Manrope } from "next/font/google";
+import { motion, easeOut, TargetAndTransition } from "framer-motion";
+
+const manrope = Manrope({ subsets: ["latin"], weight: ["400", "200"] });
+
+>>>>>>> Stashed changes
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
   visible: (i = 1) => ({
     opacity: 1,
     y: 0,
     transition: { delay: i * 0.15, duration: 0.5, ease: easeOut },
+<<<<<<< Updated upstream
   }
   )
+=======
+  }),
+>>>>>>> Stashed changes
 };
 
 export default function Home() {
 
   return (
+<<<<<<< Updated upstream
     <div className="font-sans grid grid-rows-[5vh_1fr_5vh] items-center justify-items-center min-h-screen p-[5vw] pb-[10vh] gap-[5vh]">
       <main className="flex flex-col gap-[4vh] row-start-2 items-center max-w-screen-md w-[90vw]">
         <motion.div
           className="dark:invert"
+=======
+    <div
+      className={`${manrope.className} grid grid-rows-[5vh_1fr_5vh] items-center justify-items-center min-h-screen p-[5vw] pb-[10vh] gap-[5vh]`}
+    >
+      <div className="flex flex-col gap-[4vh] row-start-2 items-center w-full">
+        <motion.div
+>>>>>>> Stashed changes
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
+<<<<<<< Updated upstream
           <Image src="/next.svg" alt="Next.js logo" width={180} height={38} priority />
+=======
+          <h1 className="text-7xl font-semibold text-white w-full flex items-center justify-center whitespace-nowrap ml-18">
+            Welcome to{" "}
+            <svg
+              width="auto"
+              height="90"
+              viewBox="0 0 400 80"
+              className="inline align-middle"
+            >
+              <defs>
+                <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#0044d6ff" />
+                  <stop offset="100%" stopColor="#02afffff" />
+                </linearGradient>
+              </defs>
+              <text
+                x="-16"
+                y="64"
+                fontSize="68"
+                fontWeight="bold"
+                fill="url(#grad1)"
+              >
+                HyJacked
+              </text>
+            </svg>
+          </h1>
+>>>>>>> Stashed changes
         </motion.div>
 
         <motion.ol
@@ -34,7 +82,15 @@ export default function Home() {
           initial="hidden"
           animate="visible"
         >
+<<<<<<< Updated upstream
           <motion.li className="mb-2 tracking-tight" custom={1} variants={fadeIn}>
+=======
+          <motion.li
+            className="mb-2 tracking-tight"
+            custom={1}
+            variants={fadeIn}
+          >
+>>>>>>> Stashed changes
             Get started by editing{" "}
             <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
               src/app/page.tsx
@@ -46,7 +102,16 @@ export default function Home() {
           </motion.li>
         </motion.ol>
 
+<<<<<<< Updated upstream
         <motion.div initial="hidden" animate="visible" variants={fadeIn} custom={3}>
+=======
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={fadeIn}
+          custom={3}
+        >
+>>>>>>> Stashed changes
           <AssetSearchComponent />
         </motion.div>
 
@@ -63,7 +128,17 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
+<<<<<<< Updated upstream
             <Image className="dark:invert" src="/vercel.svg" alt="Vercel logo" width={20} height={20} />
+=======
+            <Image
+              className="dark:invert"
+              src="/vercel.svg"
+              alt="Vercel logo"
+              width={20}
+              height={20}
+            />
+>>>>>>> Stashed changes
             Deploy now
           </a>
           <a
@@ -75,7 +150,11 @@ export default function Home() {
             Read our docs
           </a>
         </motion.div>
+<<<<<<< Updated upstream
       </main>
+=======
+      </div>
+>>>>>>> Stashed changes
 
       <motion.footer
         className="row-start-3 flex gap-[2vw] flex-wrap items-center justify-center text-[clamp(0.8rem,1.5vw,0.95rem)]"
@@ -86,6 +165,7 @@ export default function Home() {
       >
         {[
           {
+<<<<<<< Updated upstream
             href: 'https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app',
             label: 'Learn',
             icon: '/file.svg',
@@ -99,6 +179,21 @@ export default function Home() {
             href: 'https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app',
             label: 'Go to nextjs.org →',
             icon: '/globe.svg',
+=======
+            href: "https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app",
+            label: "Learn",
+            icon: "/file.svg",
+          },
+          {
+            href: "https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app",
+            label: "Examples",
+            icon: "/window.svg",
+          },
+          {
+            href: "https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app",
+            label: "Go to nextjs.org →",
+            icon: "/globe.svg",
+>>>>>>> Stashed changes
           },
         ].map(({ href, label, icon }, i) => (
           <motion.a
@@ -110,7 +205,17 @@ export default function Home() {
             custom={i + 6}
             variants={fadeIn}
           >
+<<<<<<< Updated upstream
             <Image aria-hidden src={icon} alt={`${label} icon`} width={16} height={16} />
+=======
+            <Image
+              aria-hidden
+              src={icon}
+              alt={`${label} icon`}
+              width={16}
+              height={16}
+            />
+>>>>>>> Stashed changes
             {label}
           </motion.a>
         ))}
