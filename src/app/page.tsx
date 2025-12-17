@@ -121,9 +121,9 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-<<<<<<< Updated upstream
+
             <Image className="dark:invert" src="/vercel.svg" alt="Vercel logo" width={20} height={20} />
-=======
+
             <Image
               className="dark:invert"
               src="/vercel.svg"
@@ -131,7 +131,6 @@ export default function Home() {
               width={20}
               height={20}
             />
->>>>>>> Stashed changes
             Deploy now
           </a>
           <a
@@ -143,11 +142,11 @@ export default function Home() {
             Read our docs
           </a>
         </motion.div>
-<<<<<<< Updated upstream
+
       </main>
-=======
+
       </div>
->>>>>>> Stashed changes
+
 
       <motion.footer
         className="row-start-3 flex gap-[2vw] flex-wrap items-center justify-center text-[clamp(0.8rem,1.5vw,0.95rem)]"
