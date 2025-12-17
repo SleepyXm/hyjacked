@@ -2,52 +2,45 @@
 
 import Image from "next/image";
 import AssetSearchComponent from "./components/AssetSearch";
-<<<<<<< Updated upstream
 import { motion, easeOut, TargetAndTransition } from "framer-motion";
-
-=======
 import { Manrope } from "next/font/google";
 import { motion, easeOut, TargetAndTransition } from "framer-motion";
 
 const manrope = Manrope({ subsets: ["latin"], weight: ["400", "200"] });
 
->>>>>>> Stashed changes
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
   visible: (i = 1) => ({
     opacity: 1,
     y: 0,
     transition: { delay: i * 0.15, duration: 0.5, ease: easeOut },
-<<<<<<< Updated upstream
   }
   )
-=======
   }),
->>>>>>> Stashed changes
 };
 
 export default function Home() {
 
   return (
-<<<<<<< Updated upstream
+
     <div className="font-sans grid grid-rows-[5vh_1fr_5vh] items-center justify-items-center min-h-screen p-[5vw] pb-[10vh] gap-[5vh]">
       <main className="flex flex-col gap-[4vh] row-start-2 items-center max-w-screen-md w-[90vw]">
         <motion.div
           className="dark:invert"
-=======
+
     <div
       className={`${manrope.className} grid grid-rows-[5vh_1fr_5vh] items-center justify-items-center min-h-screen p-[5vw] pb-[10vh] gap-[5vh]`}
     >
       <div className="flex flex-col gap-[4vh] row-start-2 items-center w-full">
         <motion.div
->>>>>>> Stashed changes
+
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-<<<<<<< Updated upstream
+
           <Image src="/next.svg" alt="Next.js logo" width={180} height={38} priority />
-=======
+
           <h1 className="text-7xl font-semibold text-white w-full flex items-center justify-center whitespace-nowrap ml-18">
             Welcome to{" "}
             <svg
@@ -73,7 +66,7 @@ export default function Home() {
               </text>
             </svg>
           </h1>
->>>>>>> Stashed changes
+
         </motion.div>
 
         <motion.ol
