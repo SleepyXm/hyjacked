@@ -75,15 +75,15 @@ export default function Home() {
           initial="hidden"
           animate="visible"
         >
-<<<<<<< Updated upstream
+
           <motion.li className="mb-2 tracking-tight" custom={1} variants={fadeIn}>
-=======
+
           <motion.li
             className="mb-2 tracking-tight"
             custom={1}
             variants={fadeIn}
           >
->>>>>>> Stashed changes
+
             Get started by editing{" "}
             <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
               src/app/page.tsx
