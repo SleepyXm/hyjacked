@@ -95,16 +95,16 @@ export default function Home() {
           </motion.li>
         </motion.ol>
 
-<<<<<<< Updated upstream
+
         <motion.div initial="hidden" animate="visible" variants={fadeIn} custom={3}>
-=======
+
         <motion.div
           initial="hidden"
           animate="visible"
           variants={fadeIn}
           custom={3}
         >
->>>>>>> Stashed changes
+
           <AssetSearchComponent />
         </motion.div>
 
