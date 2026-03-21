@@ -8,11 +8,8 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-<<<<<<< Updated upstream
     allow_origins=["http://localhost:3000"],
-=======
     allow_origins=["http://localhost:3001", "http://localhost:3000"],
->>>>>>> Stashed changes
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
