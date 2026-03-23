@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routers.stocks import stock_router
-from .routers.search import search_router
-from .routers.websocket import websocket_router
+from routers.stocks import stock_router
+from routers.search import search_router
+from routers.websocket import websocket_router
 
 app = FastAPI()
 
