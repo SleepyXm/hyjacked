@@ -34,3 +34,13 @@ python3 uvicorn main:app --reload
 
 
 ## This will be Deployed onto Vercel and other hosting services
+
+## NEW:
+
+Now fully enabled for docker, using doppler CLI, you will now be able to fork this project where ever without worry, as long as you use doppler CLI
+
+## Usage:
+
+``` bash
+doppler run -- docker compose up --build
+```
