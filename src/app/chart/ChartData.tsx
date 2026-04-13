@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from 'react';
-import axios from 'axios';
 
 const API_BASE = "http://localhost:8000/api"
 const STOCK_DATA_URL = `${API_BASE}/stockdata?ticker_symbol=`;
@@ -14,8 +13,9 @@ export function useChartData<T extends { time: string } = any>(ticker: string, i
 
     const fetchData = async () => {
       try {
-        const res = await axios.get(`${STOCK_DATA_URL}${ticker}&interval=${interval}`);
-        setData(res.data);
+        const res = await fetch(`${STOCK_DATA_URL}${ticker}&interval=${interval}`);
+        const data = await res.json();
+        setData(data);
       } catch (err) {
         console.error("Nothing to see here:", err);
       }
