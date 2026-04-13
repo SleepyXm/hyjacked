@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Trade } from "../types/charts";
-import axios from "axios";
 import { PriceLineOptions } from "lightweight-charts";
 
 export function PriceLines(
@@ -48,18 +47,25 @@ export default function TradeButtonRow({data, ticker, activeTrades, setActiveTra
     }
 
     try {
-      const res = await axios.post("http://localhost:8000/api/trade", {
-        ticker,
-        action,
-        price,
-        buy_price: data.buy_price,
-        sell_price: data.close,
-        time: data.time,
+      const res = await fetch("http://localhost:8000/api/trade", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ticker,
+          action,
+          price,
+          buy_price: data.buy_price,
+          sell_price: data.close,
+          time: data.time,
+        })
       });
 
-      setActiveTrades((prev) => [...prev, res.data.data]);
+      const result = await res.json();
+      setActiveTrades((prev) => [...prev, result.data]);
       alert(
-        `${action.toUpperCase()} order placed!\nPnL: $${res.data.data.pnl} | Spread: $${res.data.data.spread}`
+        `${action.toUpperCase()} order placed!\nPnL: $${result.data.pnl} | Spread: $${result.data.spread}`
       );
     } catch (e) {
       console.error(e);
@@ -68,7 +74,9 @@ export default function TradeButtonRow({data, ticker, activeTrades, setActiveTra
 
   const handleCloseTrade = async (tradeId: number) => {
     try {
-      await axios.delete(`http://localhost:8000/api/trade/${tradeId}`);
+      await fetch(`http://localhost:8000/api/trade/${tradeId}`, {
+        method: "DELETE"
+      });
       setActiveTrades((prev) => prev.filter((t) => t.trade_id !== tradeId));
     } catch (e) {
       console.error(e);

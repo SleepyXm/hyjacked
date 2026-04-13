@@ -100,7 +100,7 @@ export default function Auth() {
               </div>
 
               <form className="space-y-5" onSubmit={(e) => { e.preventDefault(); handleSubmit() }}>
-                <AuthInput label="Username" type="text" placeholder="Enter your username" value={userName} onChange={(e) => setUserName(e.target.value)} />
+                <AuthInput label="Email" type="text" placeholder="Enter your email" value={userName} onChange={(e) => setUserName(e.target.value)} />
                 <AuthInput
                   label="Password"
                   type="password"
