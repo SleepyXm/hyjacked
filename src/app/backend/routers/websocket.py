@@ -1,7 +1,6 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
-from .utils.stock_utils import load_stock_data
+from helpers.cache import get_or_fetch_candles
 import asyncio
-from datetime import datetime
 
 websocket_router = APIRouter()
 
@@ -13,30 +12,13 @@ async def broadcast_stock_data(ticker: str, interval: str):
 
     while True:
         try:
-            data, mapping = load_stock_data(ticker, interval, period="1d")
-
-            if data.empty:
+            candles = await get_or_fetch_candles(ticker, interval, "1d")
+            if not candles:
                 await broadcast_to_subs(key, {"error": "No data found"})
                 await asyncio.sleep(15)
                 continue
 
-            row = data.iloc[-1]
-            idx = data.index[-1]
-
-            close = row[mapping["close_col"]]
-            multiplier = 1.0008 if close < 10000 else 1.00008
-            buy_price = close * multiplier
-
-            candle = {
-                "time": int(idx.timestamp()),
-                "open": row[mapping["open_col"]],
-                "high": row[mapping["high_col"]],
-                "low": row[mapping["low_col"]],
-                "close": round(close, 2),
-                "buy_price": round(buy_price, 2)
-            }
-
-            await broadcast_to_subs(key, candle)
+            await broadcast_to_subs(key, candles[-1])
         except Exception as e:
             await broadcast_to_subs(key, {"error": f"Broadcast error: {str(e)}"})
 

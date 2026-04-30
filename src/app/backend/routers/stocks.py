@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
-from .utils.stock_utils import load_stock_data, INTERVALS, PERIODS
+from helpers.cache import get_or_fetch_candles
 
 stock_router = APIRouter()
 
@@ -27,29 +27,14 @@ async def get_stock_data(
         raise HTTPException(status_code=400, detail="Invalid interval or period")
 
     try:
-        data, column_mapping = load_stock_data(ticker_symbol, interval, period)
+        candles = await get_or_fetch_candles(ticker_symbol, interval, period)
     except ValueError as ve:
         raise HTTPException(status_code=404, detail=str(ve))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
-    
-    open_col = column_mapping["open_col"]
-    high_col = column_mapping["high_col"]
-    low_col = column_mapping["low_col"]
-    close_col = column_mapping["close_col"]
-    
-    chart_data = [
-        {
-            "time": int(idx.timestamp()),
-            "open": row[open_col],
-            "high": row[high_col],
-            "low": row[low_col],
-            "close": row[close_col],
-        }
-        for idx, row in data.iterrows()
-    ]
-    
-    return chart_data
+
+    return [{"time": c["time"], "open": c["open"], "high": c["high"], "low": c["low"], "close": c["close"]} for c in candles]
+
 
 @stock_router.get("/stockdata/intraday")
 async def get_intraday_data(
@@ -61,31 +46,15 @@ async def get_intraday_data(
         raise HTTPException(status_code=400, detail="Invalid interval")
     if period not in PERIODS:
         raise HTTPException(status_code=400, detail="Invalid period")
-    
+
     try:
-        data, column_mapping = load_stock_data(ticker_symbol, interval, period)
+        candles = await get_or_fetch_candles(ticker_symbol, interval, period)
     except ValueError as ve:
         raise HTTPException(status_code=404, detail=str(ve))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
-    
-    open_col = column_mapping["open_col"]
-    high_col = column_mapping["high_col"]
-    low_col = column_mapping["low_col"]
-    close_col = column_mapping["close_col"]
-    
-    chart_data = [
-        {
-            "time": int(idx.timestamp()),
-            "open": row[open_col],
-            "high": row[high_col],
-            "low": row[low_col],
-            "close": row[close_col],
-        }
-        for idx, row in data.iterrows()
-    ]
-    
-    return chart_data
+
+    return [{"time": c["time"], "open": c["open"], "high": c["high"], "low": c["low"], "close": c["close"]} for c in candles]
 
 active_trades = {}
 trade_counter = 0
