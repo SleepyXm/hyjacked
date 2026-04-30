@@ -1,68 +1,86 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
-from helpers.cache import get_or_fetch_candles
+"""
+websocket.py — Real-time stock price WebSocket endpoint (Week 2 refactor)
+
+Before (Week 1):
+  Each connection ran its own broadcast loop that called the cache every second.
+  The loop pushed directly to a set of WebSocket objects stored in memory.
+
+After (Week 2):
+  The price publisher (services/price_publisher.py) runs ONE background task per
+  (ticker, interval) and pushes candle JSON to a Redis Pub/Sub channel.
+  Each WebSocket connection here subscribes to that channel and forwards messages
+  to its browser client — no polling, no in-memory subscription dicts.
+
+Disconnect handling:
+  Starlette WebSocket doesn't expose a disconnect event directly, so we run two
+  concurrent tasks and use asyncio.wait(FIRST_COMPLETED) to react to whichever
+  finishes first:
+    forward_prices()     — reads from Redis channel, writes to WebSocket
+    wait_for_disconnect() — blocks on websocket.receive_text(); raises on disconnect
+
+  When either task finishes, we cancel the other, unsubscribe from Redis, and
+  call release_publisher() so the background task stops when no clients remain.
+
+Redis channel: ws:price:{ticker}:{interval}
+"""
+
+import json
 import asyncio
+from fastapi import APIRouter, WebSocket, Query
+from helpers.redis import redis_client
+from services.price_publisher import ensure_publisher, release_publisher
 
 websocket_router = APIRouter()
 
-subscriptions = {}  # { "AAPL_1m": set([websocket1, websocket2]) }
-fetch_tasks = {}     # { "AAPL_1m": asyncio.Task }
 
-async def broadcast_stock_data(ticker: str, interval: str):
-    key = f"{ticker}_{interval}"
-
-    while True:
-        try:
-            candles = await get_or_fetch_candles(ticker, interval, "1d")
-            if not candles:
-                await broadcast_to_subs(key, {"error": "No data found"})
-                await asyncio.sleep(15)
-                continue
-
-            await broadcast_to_subs(key, candles[-1])
-        except Exception as e:
-            await broadcast_to_subs(key, {"error": f"Broadcast error: {str(e)}"})
-
-        await asyncio.sleep(1)
-
-async def broadcast_to_subs(key: str, message: dict):
-    dead_sockets = []
-    for ws in subscriptions.get(key, []):
-        try:
-            await ws.send_json(message)
-        except:
-            dead_sockets.append(ws)
-
-    for ws in dead_sockets:
-        subscriptions[key].remove(ws)
-
-
-# --- Route ---
 @websocket_router.websocket("/ws/stockdata")
 async def websocket_stock_data(
     websocket: WebSocket,
     ticker_symbol: str,
-    interval: str = Query("1m")
+    interval: str = Query("1m"),
 ):
-    key = f"{ticker_symbol}_{interval}"
-
     await websocket.accept()
 
-    if key not in subscriptions:
-        subscriptions[key] = set()
+    # Register this connection with the publisher — starts the publish task if
+    # this is the first subscriber for this (ticker, interval) combination
+    ensure_publisher(ticker_symbol, interval)
 
-    subscriptions[key].add(websocket)
+    # Each connection gets its own pubsub object (its own Redis connection from
+    # the pool) so that subscribing/unsubscribing doesn't affect other clients
+    pubsub = redis_client.pubsub()
+    channel = f"ws:price:{ticker_symbol}:{interval}"
+    await pubsub.subscribe(channel)
 
-    # Start background fetcher if not running
-    if key not in fetch_tasks:
-        fetch_tasks[key] = asyncio.create_task(broadcast_stock_data(ticker_symbol, interval))
+    async def forward_prices() -> None:
+        """Read candle messages from Redis and push them to the browser."""
+        try:
+            async for message in pubsub.listen():
+                if message["type"] == "message":
+                    await websocket.send_json(json.loads(message["data"]))
+        except Exception:
+            pass
+
+    async def wait_for_disconnect() -> None:
+        """Block until the client disconnects (receive raises on close)."""
+        try:
+            while True:
+                await websocket.receive_text()
+        except Exception:
+            pass
+
+    forward_task    = asyncio.create_task(forward_prices())
+    disconnect_task = asyncio.create_task(wait_for_disconnect())
 
     try:
-        while True:
-            await asyncio.sleep(60)  # keep alive
-    except WebSocketDisconnect:
-        subscriptions[key].remove(websocket)
-        if not subscriptions[key]:
-            del subscriptions[key]
-            fetch_tasks[key].cancel()
-            del fetch_tasks[key]
-        print(f"Client disconnected: {ticker_symbol} [{interval}]")
+        # Wait for whichever task ends first (disconnect or a forwarding error)
+        _, pending = await asyncio.wait(
+            [forward_task, disconnect_task],
+            return_when=asyncio.FIRST_COMPLETED,
+        )
+        for task in pending:
+            task.cancel()
+    finally:
+        # Always clean up the Redis subscription and decrement the publisher counter
+        await pubsub.unsubscribe(channel)
+        await pubsub.aclose()
+        release_publisher(ticker_symbol, interval)
